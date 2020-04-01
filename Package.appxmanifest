@@ -14,7 +14,7 @@
   <mp:PhoneIdentity PhoneProductId="301966fc-e0b6-46ff-9e75-f6fa3845d4a1" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>CatanSvcTestClient</DisplayName>
+    <DisplayName>Catan Service Test Client</DisplayName>
     <PublisherDisplayName>joelo</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
