@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace CatanSvcTestClient
 {
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, Desert, Back, None, Sea, GoldMine };
     public enum DevCardType { Knight, VictoryPoint, YearOfPlenty, RoadBuilding, Monopoly };
+    public enum TileOrientation { FaceDown, FaceUp, None };
+    public enum HarborType { Sheep, Wood, Ore, Wheat, Brick, ThreeForOne, Uninitialized, None };
 
     public class ResourceCountClass
     {
@@ -43,12 +46,15 @@ namespace CatanSvcTestClient
         }
     }
 
-    public class UserResources
+    public class PlayerResources
     {
         public Dictionary<DevCardType, int> DevCards { get; } = new Dictionary<DevCardType, int>();
+        [JsonIgnore]
         public Dictionary<ResourceType, int> ResourceCards { get; } = new Dictionary<ResourceType, int>();
+        public string PlayerName { get; set; }
+        public string GameName { get; set; }
 
-        public UserResources()
+        public PlayerResources()
         {
             foreach (ResourceType key in Enum.GetValues(typeof(ResourceType)))
             {
@@ -58,6 +64,24 @@ namespace CatanSvcTestClient
             foreach (DevCardType key in Enum.GetValues(typeof(DevCardType)))
             {
                 DevCards[key] = 0;
+            }
+        }
+
+        public ResourceCountClass ResourceCount
+        {
+            get
+            {
+                ResourceCountClass ret = new ResourceCountClass
+                {
+                    GoldMine = ResourceCards[ResourceType.GoldMine],
+                    Wood = ResourceCards[ResourceType.Wood],
+                    Brick = ResourceCards[ResourceType.Brick],
+                    Sheep = ResourceCards[ResourceType.Sheep],
+                    Wheat = ResourceCards[ResourceType.Wheat],
+                    Ore = ResourceCards[ResourceType.Ore]
+                };
+
+                return ret;
             }
         }
     }

@@ -7,23 +7,68 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     RequestedTheme="Dark"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="163*"/>
-            <RowDefinition Height="837*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="100*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-        <Button Content="Start" Margin="10" VerticalAlignment="Top" Height="70" Width="185" Click="Button_Click"/>
-            <Button Content="Bad Trade Request"  Margin="10" VerticalAlignment="Top" Height="70" Width="185" Click="OnBadTradeRequest"/>
-            <Button Content="Gold Trade" Margin="10"  VerticalAlignment="Top" Height="70" Width="185" Click="OnTradeInGold"/>
-            <Button Content="Do Trade" Margin="10"  VerticalAlignment="Top" Height="70" Width="185" Click="OnDoTrade"/>
-            <Button Content="Take Card" Margin="10"  VerticalAlignment="Top" Height="70" Width="185" Click="OnTakeCard"/>
-            <Button Content="3:1" Margin="10"  VerticalAlignment="Top" Height="70" Width="185" Click="OnTradeThreeForOne"/>
+        <Viewbox Grid.RowSpan="1">
+        <StackPanel Orientation="Horizontal" Grid.RowSpan="1">
+            <Button Content="Start" Margin="10" VerticalAlignment="Stretch"  Width="185" Click="OnStart"/>
+            <Button Content="Grant Resources"  Margin="10" VerticalAlignment="Stretch" Width="185" Click="OnGrantResources"/>
+            <Button Content="Bad Trade Request"  Margin="10" VerticalAlignment="Stretch" Width="185" Click="OnBadTradeRequest"/>
+            <Button Content="Gold Trade" Margin="10"  VerticalAlignment="Stretch"  Width="185" Click="OnTradeInGold"/>
+            <Button Content="Do Trade" Margin="10"  VerticalAlignment="Stretch"  Width="185" Click="OnDoTrade"/>
+            <Button Content="Take Card" Margin="10"  VerticalAlignment="Stretch"  Width="185" Click="OnTakeCard"/>
+            <Button Content="3:1" Margin="10"  VerticalAlignment="Stretch"  Width="185" Click="OnTradeThreeForOne"/>
         </StackPanel>
+        </Viewbox>
 
-        <TextBox Name="_txt" Text="" AcceptsReturn="True" TextWrapping="Wrap"  Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+        <Grid Background="Gray" Grid.Row="2">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="40*"/>
+            </Grid.ColumnDefinitions>
+            <Viewbox Grid.RowSpan="5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <StackPanel Orientation="Vertical" Background="Blue" Grid.RowSpan="5">
+                    <local:PlayerResourceCard x:Name="_player1Resources" Grid.Column="0" Caption="Player 1" ReadOnly="True"   />
+                    <local:PlayerResourceCard x:Name="_player1Trade" ShowUsers="False" Caption="To Trade" ReadOnly="False">
+                        <local:PlayerResourceCard.RenderTransform>
+                            <ScaleTransform ScaleX=".75" ScaleY=".75"/>
+                        </local:PlayerResourceCard.RenderTransform>
+                    </local:PlayerResourceCard>
+                    <local:PlayerResourceCard x:Name="_player2Resources" Grid.Column="0" Caption="Player 2" ReadOnly="True"  />
+                    <local:PlayerResourceCard x:Name="_player2Trade" ShowUsers="False"  Caption="To Trade"  >
+                        <local:PlayerResourceCard.RenderTransform>
+                            <ScaleTransform ScaleX=".75" ScaleY=".75"/>
+                        </local:PlayerResourceCard.RenderTransform>
+                    </local:PlayerResourceCard>
+                    <local:PlayerResourceCard x:Name="_bank" ShowUsers="False"  Caption="Bank"     ReadOnly="False"        />
+                    <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" >
+                        <TextBlock Text="Player:" Margin="10,0,10,0" FontSize="20" />
+                        <ComboBox Name="_cmbPlayers" ItemsSource="{x:Bind _lstPlayerList, Mode=OneWay}" VerticalAlignment="Center" FontSize="10" Width="200" 
+                                  MaxDropDownHeight="500" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.CanContentRenderOutsideBounds="True" />
+                    </StackPanel>
+                </StackPanel>
+            </Viewbox>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10*"/>
+                    <RowDefinition Height="10*"/>
+                </Grid.RowDefinitions>
+                    <TextBox  Text="{x:Bind RESTReturnValue, Mode=OneWay}" 
+                                FontFamily="Consolas" AcceptsReturn="True" TextWrapping="Wrap"  Grid.Row="0" Grid.Column="2" ScrollViewer.VerticalScrollBarVisibility="Visible"  />
+                    <TextBox Text="{x:Bind ChangeLog, Mode=OneWay}" 
+                                FontFamily="Consolas" AcceptsReturn="True" TextWrapping="Wrap"  Grid.Row="1" Grid.Column="2"  ScrollViewer.VerticalScrollBarVisibility="Visible"  />
+            </Grid>
+
+        </Grid>
+       
 
     </Grid>
+        
 </Page>

@@ -124,6 +124,13 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceCardCtrl.xaml.cs">
+      <DependentUpon>ResourceCardCtrl.xaml </DependentUpon>
+    </Compile>
+    <Compile Include="StaticHelpers.cs" />
+    <Compile Include="PlayerResourceCards.xaml.cs">
+      <DependentUpon>PlayerResourceCards.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -131,6 +138,13 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\back.png" />
+    <Content Include="Assets\brick.png" />
+    <Content Include="Assets\gold.png" />
+    <Content Include="Assets\ore.png" />
+    <Content Include="Assets\sheep.png" />
+    <Content Include="Assets\wheat.png" />
+    <Content Include="Assets\wood.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -148,6 +162,14 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ResourceCardCtrl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PlayerResourceCards.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
