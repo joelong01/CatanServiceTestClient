@@ -127,6 +127,7 @@
     <Compile Include="ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml </DependentUpon>
     </Compile>
+    <Compile Include="ServiceMonitor.cs" />
     <Compile Include="StaticHelpers.cs" />
     <Compile Include="PlayerResourceCards.xaml.cs">
       <DependentUpon>PlayerResourceCards.xaml</DependentUpon>
@@ -141,10 +142,15 @@
     <Content Include="Assets\back.png" />
     <Content Include="Assets\brick.png" />
     <Content Include="Assets\gold.png" />
+    <Content Include="Assets\knight.jpg" />
+    <Content Include="Assets\Monopoly.jpg" />
     <Content Include="Assets\ore.png" />
+    <Content Include="Assets\RoadBuilding.jpg" />
     <Content Include="Assets\sheep.png" />
+    <Content Include="Assets\VictoryPoint.jpg" />
     <Content Include="Assets\wheat.png" />
     <Content Include="Assets\wood.png" />
+    <Content Include="Assets\YearOfPlenty.jpg" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />

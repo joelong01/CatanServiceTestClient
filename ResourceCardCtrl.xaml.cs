@@ -110,7 +110,7 @@ namespace CatanSvcTestClient
         private void SetResourceType(ResourceType value)
         {
             string bitmapPath = "ms-appx:Assets/back.jpg";
-
+            // VictoryPoint, Knight, YearOfPlenty, RoadBuilding, Monopoly
             switch (value)
             {
                 case ResourceType.Sheep:
@@ -134,6 +134,21 @@ namespace CatanSvcTestClient
                     break;
                 case ResourceType.GoldMine:
                     bitmapPath = "ms-appx:Assets/gold.png";
+                    break;
+                case ResourceType.VictoryPoint:
+                    bitmapPath = "ms-appx:Assets/VictoryPoint.jpg";
+                    break;
+                case ResourceType.Knight:
+                    bitmapPath = "ms-appx:Assets/knight.jpg";
+                    break;
+                case ResourceType.YearOfPlenty:
+                    bitmapPath = "ms-appx:Assets/YearOfPlenty.jpg";
+                    break;
+                case ResourceType.RoadBuilding:
+                    bitmapPath = "ms-appx:Assets/RoadBuilding.jpg";
+                    break;
+                case ResourceType.Monopoly:
+                    bitmapPath = "ms-appx:Assets/Monopoly.jpg";
                     break;
 
                 default:

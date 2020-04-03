@@ -1,0 +1,19 @@
+api/catan/game/register (POST)
+api/catan/game (DELETE)
+api/catan/game/users/game=foo (GET)
+
+api/catan/cards/add/game=foo&user=joe (POST)
+api/catan/cards/game=foo&user=joe (GET)
+api/catan/cards/tradegold/game=foo&user=joe (POST)
+api/catan/cards/trade/game=foo&from=joe&to=doug	(POST)
+api/catan/cards/take/game=foo&from=joe&to=dodgy	(POST)
+api/catan/cards/meritimetrade/user=joe&game=foo (POST)
+
+
+api/catan/devcards (GET)
+api/catan/devcards/buy/user=joe&game=foo (POST)
+api/catan/devcards/monopoly/user=joe&resource=wheat&game=foo (POST)
+api/catan/devcards/roadbuilding/user=joe&game=foo (POST)
+api/catan/devcards/yearofplenty/user=joe&game=foo
+api/catan/devcards/knight/user=joe&game=foo
+

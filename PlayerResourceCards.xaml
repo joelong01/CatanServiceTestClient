@@ -5,30 +5,91 @@
     xmlns:local="using:CatanSvcTestClient"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    d:DesignHeight="635"
+    d:DesignWidth="625">
+    <Control.Resources>
+        <Style TargetType="TextBlock" x:Key="TbStyle">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="Button" x:Key="CommandButtonStyle">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5" />
+        </Style>
+    </Control.Resources>
+    <Border BorderBrush="Black" BorderThickness="2" Margin="-2,2, 20, -2">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0" Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Target: " Style="{StaticResource TbStyle}"/>
+                <ComboBox Grid.Column="1" FontSize="20" Margin="0,0,0,0" HorizontalAlignment="Stretch" ItemsSource="{x:Bind PlayerResources.Players, Mode=OneWay}"/>
+            </Grid>
+            <StackPanel Grid.Column="1" Grid.Row="1"  Margin="0,0,0,0" VerticalAlignment="top">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="100"/>
-        </Grid.RowDefinitions>
-        
-        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" >
-            <TextBlock Text="{x:Bind Caption, Mode=TwoWay, FallbackValue=Player Name}" FontSize="20" Margin="10,0,10,0"/>
-            <ComboBox Name="_cmbPlayers" HorizontalAlignment="Right" VerticalAlignment="Stretch" ItemsSource="{x:Bind _lstPlayerList, Mode=OneWay}" SelectionChanged="OnUserChanged"  Width="293" FontSize="20" />
-        </StackPanel>
-        
-
-        <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <local:ResourceCardCtrl x:Name="_goldMine" ResourceType="GoldMine" Orientation="FaceUp" Count="{x:Bind PlayerResources.GoldMine, Mode=TwoWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_wood" ResourceType="Wood" Orientation="FaceUp"         Count="{x:Bind PlayerResources.Wood, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_brick" ResourceType="Brick" Orientation="FaceUp"       Count="{x:Bind PlayerResources.Brick, Mode=TwoWay}"  Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_sheep" ResourceType="Sheep" Orientation="FaceUp"       Count="{x:Bind PlayerResources.Sheep, Mode=TwoWay}"  Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_wheat" ResourceType="Wheat" Orientation="FaceUp"       Count="{x:Bind PlayerResources.Wheat, Mode=TwoWay}" Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_ore" ResourceType="Ore" Orientation="FaceUp"           Count="{x:Bind PlayerResources.Ore, Mode=TwoWay}"  Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="1"/>
-        </StackPanel>
-
-
-
-    </Grid>
+                <Button Content="Trade" Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Buy Dev Card" Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Buy Settlement" Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Buy City" Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Meritime Trade" Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Take Card" Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Play Dev Card" Style="{StaticResource CommandButtonStyle}" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,5,0,5" Grid.ColumnSpan="2">
+                <TextBlock Text="Name:"  Style="{StaticResource TbStyle}"/>
+                <TextBlock Text="{x:Bind PlayerResources.PlayerName, Mode=OneWay}" Style="{StaticResource TbStyle}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Margin="0,5,0,5">
+                <TextBlock Text="Current Resources: "  Style="{StaticResource TbStyle}" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <local:ResourceCardCtrl ResourceType="GoldMine" Orientation="FaceUp"    Count="{x:Bind PlayerResources.GoldMine, Mode=TwoWay}" />
+                    <local:ResourceCardCtrl ResourceType="Wood"     Orientation="FaceUp"    Count="{x:Bind PlayerResources.Wood, Mode=TwoWay}"     />
+                    <local:ResourceCardCtrl ResourceType="Brick"    Orientation="FaceUp"    Count="{x:Bind PlayerResources.Brick, Mode=TwoWay}"    />
+                    <local:ResourceCardCtrl ResourceType="Sheep"    Orientation="FaceUp"    Count="{x:Bind PlayerResources.Sheep, Mode=TwoWay}"    />
+                    <local:ResourceCardCtrl ResourceType="Wheat"    Orientation="FaceUp"    Count="{x:Bind PlayerResources.Wheat, Mode=TwoWay}"    />
+                    <local:ResourceCardCtrl ResourceType="Ore"      Orientation="FaceUp"    Count="{x:Bind PlayerResources.Ore, Mode=TwoWay}"      />
+                </StackPanel>
+                <TextBlock Text="Resources to Use for Trade or Purchase "  Style="{StaticResource TbStyle}" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10">
+                    <local:ResourceCardCtrl ResourceType="GoldMine" Orientation="FaceUp"    Count="{x:Bind TradeResources.GoldMine, Mode=TwoWay}" ReadOnly="False" />
+                    <local:ResourceCardCtrl ResourceType="Wood"     Orientation="FaceUp"    Count="{x:Bind TradeResources.Wood, Mode=TwoWay}"     ReadOnly="False" />
+                    <local:ResourceCardCtrl ResourceType="Brick"    Orientation="FaceUp"    Count="{x:Bind TradeResources.Brick, Mode=TwoWay}"    ReadOnly="False" />
+                    <local:ResourceCardCtrl ResourceType="Sheep"    Orientation="FaceUp"    Count="{x:Bind TradeResources.Sheep, Mode=TwoWay}"    ReadOnly="False" />
+                    <local:ResourceCardCtrl ResourceType="Wheat"    Orientation="FaceUp"    Count="{x:Bind TradeResources.Wheat, Mode=TwoWay}"    ReadOnly="False" />
+                    <local:ResourceCardCtrl ResourceType="Ore"      Orientation="FaceUp"    Count="{x:Bind TradeResources.Ore, Mode=TwoWay}"      ReadOnly="False" />
+                    <StackPanel.RenderTransform>
+                        <CompositeTransform ScaleX="1" ScaleY="1" />
+                    </StackPanel.RenderTransform>
+                </StackPanel>
+                <TextBlock Text="My Unplayed Resource Cards"  Style="{StaticResource TbStyle}" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <local:ResourceCardCtrl ResourceType="Knight" Orientation="FaceUp"          Count="{x:Bind PlayerResources.KnightsNotPlayed,       Mode=OneWay}" />
+                    <local:ResourceCardCtrl ResourceType="YearOfPlenty" Orientation="FaceUp"    Count="{x:Bind PlayerResources.YearOfPlentyNotPlayed,  Mode=OneWay}" />
+                    <local:ResourceCardCtrl ResourceType="Monopoly" Orientation="FaceUp"        Count="{x:Bind PlayerResources.MonopolyNotPlayed,      Mode=OneWay}" />
+                    <local:ResourceCardCtrl ResourceType="RoadBuilding" Orientation="FaceUp"    Count="{x:Bind PlayerResources.RoadBuildingNotPlayed,  Mode=OneWay}" />
+                    <local:ResourceCardCtrl ResourceType="VictoryPoint" Orientation="FaceUp"    Count="{x:Bind PlayerResources.VictoryPoints,          Mode=OneWay}" Margin="70,0,0,0"/>
+                </StackPanel>
+                <TextBlock Text="My Played Resource Cards" Style="{StaticResource TbStyle}" />
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                    <local:ResourceCardCtrl ResourceType="Knight" Orientation="FaceUp"          Count="{x:Bind PlayerResources.KnightsPlayed,       Mode=OneWay}" />
+                    <local:ResourceCardCtrl ResourceType="YearOfPlenty" Orientation="FaceUp"    Count="{x:Bind PlayerResources.YearOfPlentyPlayed,  Mode=OneWay}" />
+                    <local:ResourceCardCtrl ResourceType="Monopoly" Orientation="FaceUp"        Count="{x:Bind PlayerResources.MonopolyPlayed,      Mode=OneWay}" />
+                    <local:ResourceCardCtrl ResourceType="RoadBuilding" Orientation="FaceUp"    Count="{x:Bind PlayerResources.RoadBuildingPlayed,  Mode=OneWay}" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>

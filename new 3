@@ -1,0 +1,171 @@
+api/catan/game/register (POST)
+	{
+		"game":"foo",
+		"name":"joe"
+		
+	}
+=> creates the game if it doesn't exist
+
+api/catan/game (DELETE)
+
+=> removes all state for the game
+
+api/catan/game/users/game=foo (GET)
+=> returns
+{	
+	[
+		"joe",
+		"dodgy",
+		"doug",
+		"robert",
+		"chris"
+	
+	]
+}
+
+api/catan/cards/game=foo&user=joe (POST)
+	{		
+		"wheat": 0,
+		"ore":1,
+		"brick":2,
+		"wood":0,
+		"gold":1
+	}
+=> add each card
+
+api/catan/cards/remove/game=foo&user=joe (POST)
+	{		
+		"wheat": 0,
+		"ore":0,
+		"brick":2,
+		"wood":2,
+		"gold":0
+	}
+
+=> subtract each card
+
+api/catan/cards/game=foo&user=joe (GET)
+
+=> returns totals
+	{		
+		"wheat": 0,
+		"ore":0,
+		"brick":2,
+		"wood":2,
+		"gold":0
+	}
+
+=> poll?  Manual refresh?  WebSockets?
+
+api/catan/cards/tradegold/game=foo&user=joe (POST)
+	{		
+		"wheat": 0,
+		"ore":0,
+		"brick":2,
+		"wood":2,
+		"gold":4
+	}
+
+=> Validates that Gold exists
+=> Validates that number submitted = number returned
+
+
+
+api/catan/cards/trade/game=foo&from=joe&to=doug	(POST)
+{
+	{
+				
+		"wheat": 0,
+		"ore":0,
+		"brick":1,
+		"wood":0,
+		"gold":0,
+	},
+	{
+		"wheat": 0,
+		"ore":0,
+		"brick":0,
+		"wood":1,
+		"gold":0,
+	}
+	
+}
+
+=> Trade is *always* initialized by whose turn it is (convention)
+=> UI should show "trade this for that"
+=> it'd be nice to have a UI that accepts the trade and then the trade completes. (v2)
+
+api/catan/cards/take/game=foo&from=joe&to=dodgy	(POST)
+
+returns
+{
+	"resource":"Wheat"
+}
+
+=> subtract from and adds to
+=> causes refresh, ignores return
+
+
+api/catan/cards/meritimetrade/user=joe&game=foo
+{
+	"in":"wheat",
+	"count":"3",
+	"out":"wood"
+}
+
+=> validates that there are count of "in" items
+=> subtracts count of in items from joe
+=> adds 1 of out items to joe
+=> UI has to support 4:1, 3:1, and 2:1 trades
+-----------------------------------------------------------------------------
+=> Rolled 7 is a manual thing as the user needs to pick the cards to return
+-------------------------------------------------------------------------------
+api/catan/devcard 
+there are 25 development cards: 14 knight cards, 5 victory point cards, 2 road building, 2 year of plenty, and 2 monopoly
+
+api/catan/devcard (GET)
+=> returns
+{
+	[
+		{
+			"Card": "YearOfPlenty",
+			"Played":true
+		},
+		{
+			"Card": "VictoryPoint",
+			"Played": false
+		},
+		{
+			"Card": "Knight",
+			"Played": true
+		},		
+		{
+			"Card": "Knight",
+			"Played": false
+		}
+	]
+}
+
+api/catan/devcard/buy/user=joe&game=foo (POST)
+ 
+ => subtracks resource cards from joe (1W, 1O, 1S)
+ => validates that resources exist
+ => adds a random dev card to joe
+
+api/catan/devcard/monopoly/user=joe&resource=wheat&game=foo (POST)
+ 
+
+=> go through all users and add up the # of wheat
+=> set wheat to 0 for all users except joe
+=> add wheat to joe
+=> notify clients
+
+api/catan/devcard/roadbuilding/user=joe&game=foo
+=> just removes the card
+
+api/catan/devcard/yearofplenty/user=joe&game=foo
+=> gives two gold to joe, then use api/catan/cards/tradegold to pick resources
+
+api/catan/devcard/knight/user=joe&game=foo
+=> just removes the card
+
