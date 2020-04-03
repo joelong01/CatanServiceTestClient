@@ -1,4 +1,5 @@
-﻿using CatanSvcTestClient;
+﻿using CatanSharedModels;
+using CatanSvcTestClient;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

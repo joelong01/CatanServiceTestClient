@@ -20,12 +20,12 @@
         
 
         <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <local:ResourceCardCtrl x:Name="_goldMine" ResourceType="GoldMine" Orientation="FaceUp" Count="0"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_wood" ResourceType="Wood" Orientation="FaceUp" Count="0" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_brick" ResourceType="Brick" Orientation="FaceUp" Count="0"  Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_sheep" ResourceType="Sheep" Orientation="FaceUp" Count="0"  Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_wheat" ResourceType="Wheat" Orientation="FaceUp" Count="0" Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="1"/>
-            <local:ResourceCardCtrl x:Name="_ore" ResourceType="Ore" Orientation="FaceUp" Count="0"  Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="1"/>
+            <local:ResourceCardCtrl x:Name="_goldMine" ResourceType="GoldMine" Orientation="FaceUp" Count="{x:Bind PlayerResources.GoldMine, Mode=TwoWay}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1"/>
+            <local:ResourceCardCtrl x:Name="_wood" ResourceType="Wood" Orientation="FaceUp"         Count="{x:Bind PlayerResources.Wood, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1"/>
+            <local:ResourceCardCtrl x:Name="_brick" ResourceType="Brick" Orientation="FaceUp"       Count="{x:Bind PlayerResources.Brick, Mode=TwoWay}"  Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1"/>
+            <local:ResourceCardCtrl x:Name="_sheep" ResourceType="Sheep" Orientation="FaceUp"       Count="{x:Bind PlayerResources.Sheep, Mode=TwoWay}"  Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="1"/>
+            <local:ResourceCardCtrl x:Name="_wheat" ResourceType="Wheat" Orientation="FaceUp"       Count="{x:Bind PlayerResources.Wheat, Mode=TwoWay}" Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="1"/>
+            <local:ResourceCardCtrl x:Name="_ore" ResourceType="Ore" Orientation="FaceUp"           Count="{x:Bind PlayerResources.Ore, Mode=TwoWay}"  Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="1"/>
         </StackPanel>
 
 

@@ -51,7 +51,7 @@
                     <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" >
                         <TextBlock Text="Player:" Margin="10,0,10,0" FontSize="20" />
                         <ComboBox Name="_cmbPlayers" ItemsSource="{x:Bind _lstPlayerList, Mode=OneWay}" VerticalAlignment="Center" FontSize="10" Width="200" 
-                                  MaxDropDownHeight="500" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.CanContentRenderOutsideBounds="True" />
+                                  MaxDropDownHeight="500" ScrollViewer.VerticalScrollMode="Enabled"  />
                     </StackPanel>
                 </StackPanel>
             </Viewbox>

@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
-namespace CatanSvcTestClient
+namespace CatanSharedModels
 {
     public enum TileOrientation { FaceDown, FaceUp, None };
     public enum HarborType { Sheep, Wood, Ore, Wheat, Brick, ThreeForOne, Uninitialized, None };
@@ -13,16 +13,7 @@ namespace CatanSvcTestClient
 
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, Desert, Back, None, Sea, GoldMine };
     public enum DevCardType { Knight, VictoryPoint, YearOfPlenty, RoadBuilding, Monopoly, Unknown };
-    public class ResourceCountClass
-    {
-        public int Wheat { get; set; }
-        public int Wood { get; set; }
-        public int Ore { get; set; }
-        public int Sheep { get; set; }
-        public int Brick { get; set; }
-        public int GoldMine { get; set; }
 
-    }
 
     public class PlayerId : IEqualityComparer<PlayerId>
     {
@@ -33,7 +24,7 @@ namespace CatanSvcTestClient
         {
             return $"{GameName} - {PlayerName}";
         }
-        public bool Equals( PlayerId x,  PlayerId y)
+        public bool Equals(PlayerId x, PlayerId y)
         {
             if (x is null || y is null) return false;
 
@@ -68,9 +59,10 @@ namespace CatanSvcTestClient
 
         public event PropertyChangedEventHandler PropertyChanged;
         [JsonIgnore]
-        private int Total => Wheat + Wood + Brick + Ore + Sheep + GoldMine ;
+        public int TotalResources => Wheat + Wood + Brick + Ore + Sheep + GoldMine;
+
         [JsonIgnore]
-        private TaskCompletionSource<object> ResourceUpdateTCS { get; set; } = null;
+        public TaskCompletionSource<object> ResourceUpdateTCS { get; set; } = null;
         public string PlayerName
         {
             get
@@ -206,13 +198,7 @@ namespace CatanSvcTestClient
                 }
             }
         }
-        public int TotalResources
-        {
-            get
-            {
-                return Wheat + Wood + Brick + Ore + Sheep + GoldMine;
-            }
-        }
+
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -245,15 +231,6 @@ namespace CatanSvcTestClient
             GoldMine += toAdd.GoldMine;
         }
 
-        public void SubtractResources(PlayerResources toSubtract)
-        {
-            Wheat -= toSubtract.Wheat;
-            Wood -= toSubtract.Wood;
-            Brick -= toSubtract.Brick;
-            Ore -= toSubtract.Ore;
-            Sheep -= toSubtract.Sheep;
-            GoldMine -= toSubtract.GoldMine;
-        }
 
         public int ResourceCount(ResourceType resourceType)
         {
@@ -304,7 +281,5 @@ namespace CatanSvcTestClient
             }
         }
 
-     }
+    }
 }
-
-
