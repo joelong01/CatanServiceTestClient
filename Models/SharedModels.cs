@@ -167,7 +167,8 @@ namespace CatanSharedModels
         public event PropertyChangedEventHandler PropertyChanged;
         [JsonIgnore]
         public int TotalResources => Wheat + Wood + Brick + Ore + Sheep + GoldMine;
-
+        [JsonIgnore]
+        public PlayerResources This => this;
         [JsonIgnore]
         public TaskCompletionSource<object> ResourceUpdateTCS { get; set; } = null;
         [JsonPropertyName("PlayerName")]
@@ -270,6 +271,9 @@ namespace CatanSharedModels
                 {
                     _wheat = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("CanBuyDevCard");
+                    NotifyPropertyChanged("CanBuySettlement");
+                    NotifyPropertyChanged("CanBuyCity");
                 }
             }
         }
@@ -285,6 +289,8 @@ namespace CatanSharedModels
                 {
                     _wood = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("CanBuyRoad");
+                    NotifyPropertyChanged("CanBuySettlement");
                 }
             }
         }
@@ -300,6 +306,8 @@ namespace CatanSharedModels
                 {
                     _ore = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("CanBuyDevCard");
+                    NotifyPropertyChanged("CanBuyCity");
                 }
             }
         }
@@ -315,6 +323,8 @@ namespace CatanSharedModels
                 {
                     _sheep = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("CanBuyDevCard");
+                    NotifyPropertyChanged("CanBuySettlement");
                 }
             }
         }
@@ -331,6 +341,8 @@ namespace CatanSharedModels
                 {
                     _brick = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("CanBuyRoad");
+                    NotifyPropertyChanged("CanBuySettlement");
                 }
             }
         }
@@ -346,6 +358,7 @@ namespace CatanSharedModels
                 {
                     _goldMine = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("CanTradeGold");
                 }
             }
         }
@@ -419,6 +432,16 @@ namespace CatanSharedModels
             }
         }
 
+        [JsonIgnore]
+        public bool CanBuyDevCard => (Wheat > 0 && Sheep > 0 && Ore > 0);
+        [JsonIgnore]
+        public bool CanBuySettlement => (Wheat > 0 && Sheep > 0 && Brick > 0 && Wood > 0);
+        [JsonIgnore]
+        public bool CanBuyCity => (Wheat > 1  && Ore > 2);
+        [JsonIgnore]
+        public bool CanBuyRoad => (Brick > 0 && Wood > 0);
+        [JsonIgnore]
+        public bool CanTradeGold => (GoldMine > 0);
 
         public int AddResource(ResourceType resourceType, int count)
         {

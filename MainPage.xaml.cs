@@ -29,7 +29,7 @@ namespace CatanSvcTestClient
         private string _hostName = "http://localhost:50919";
         private string GameName { get; } = "Game";
         ServiceMonitor _logMonitor;
-        List<MonitorPlayerResources> _monitors = new List<MonitorPlayerResources>();
+        
 
         public static readonly DependencyProperty RESTReturnValueProperty = DependencyProperty.Register("RESTReturnValue", typeof(string), typeof(MainPage), new PropertyMetadata(""));
         public static readonly DependencyProperty ChangeLogProperty = DependencyProperty.Register("ChangeLog", typeof(string), typeof(MainPage), new PropertyMetadata(""));
@@ -83,11 +83,7 @@ namespace CatanSvcTestClient
             };
 
             Players.Clear();
-            foreach (var monitor in _monitors)
-            {
-                monitor.Stop();
-            }
-            _monitors.Clear();
+          
 
             var players = new string[] { "Joe", "Dodgy", "Doug", "Chris" };
             _ = await client.DeleteAsync($"{_hostName}/api/catan/game/delete/{GameName}/");
@@ -101,17 +97,12 @@ namespace CatanSvcTestClient
                     
                     PlayerResources resources = PlayerResources.Deserialize<PlayerResources>(json);
                     Players.Add(resources);
-                    MonitorPlayerResources monitor = new MonitorPlayerResources(GameName, player, _hostName, resources);
-                    _monitors.Add(monitor);
+                   
+                  
                 }
 
             }
-
             _logMonitor.Start();
-            foreach (var monitor in _monitors)
-            {
-                monitor.Start();
-            }
 
         }
 
