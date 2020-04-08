@@ -33,7 +33,7 @@
                 <Button Content="Start"                  Click="OnStart"                Style="{StaticResource CommandButtonStyle}"/>
                 <Button Content="Resources To All"       Click="OnGrantResourcesToAll"  Style="{StaticResource CommandButtonStyle}"/>
                 <Button Content="Grant Resources"        Click="OnGrantResources"       Style="{StaticResource CommandButtonStyle}" />
-                <Button Content="Bad Trade Request"      Click="OnBadTradeRequest"      Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Test"                   Click="OnTest"                 Style="{StaticResource CommandButtonStyle}" />
                 <Button Content="Gold Trade"             Click="OnTradeInGold"          Style="{StaticResource CommandButtonStyle}" />
                 <Button Content="Do Trade"               Click="OnDoTrade"              Style="{StaticResource CommandButtonStyle}" />
                 <Button Content="3:1"                    Click="OnTradeThreeForOne"     Style="{StaticResource CommandButtonStyle}" />
@@ -43,8 +43,8 @@
             <TextBlock Style="{StaticResource TbStyle}" Text="Player:" Margin="5,0,5,0" VerticalAlignment="Center"/>
             <ComboBox ItemsSource="{x:Bind Players}" VerticalAlignment="Center" Width="200" SelectedItem="{x:Bind CurrentPlayer, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="models:PlayerResources">
-                        <TextBlock Style="{StaticResource TbStyle}" Text="{x:Bind PlayerName, Mode=OneWay}" />
+                    <DataTemplate x:DataType="models:ClientResourceModel">
+                        <TextBlock Style="{StaticResource TbStyle}" Text="{x:Bind PlayerResources.PlayerName, Mode=OneWay}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -56,7 +56,7 @@
                 <ColumnDefinition Width="40*"/>
             </Grid.ColumnDefinitions>
 
-            <ListBox  Background="green" ItemsSource="{x:Bind Players, Mode=OneWay}">
+            <ListBox Name="_lstPlayer" Background="green" ItemsSource="{x:Bind Players, Mode=OneWay}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="Margin" Value="8,10,0,0"/>
@@ -65,9 +65,9 @@
                 </ListBox.ItemContainerStyle>
                 <ListBoxItem Padding="0" Margin="0,20,0,0"/>
                 <ListBox.ItemTemplate>
-                    <DataTemplate  x:DataType="models:PlayerResources">
+                    <DataTemplate  x:DataType="models:ClientResourceModel">
                         <Viewbox>
-                            <local:PlayerResourceCard PlayerResources="{x:Bind This, Mode=OneWay}" />
+                            <local:PlayerResourceCard ClientModel ="{x:Bind This, Mode=OneWay}" OnCallback="Player_OnCallback" />
                         </Viewbox>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

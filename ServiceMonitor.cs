@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -23,7 +24,7 @@ namespace CatanServiceMonitor
 
     }
 
-    
+
 
     /// <summary>
     ///     Assumes that it is called on a UI thread.  does non-blocking calls to the service to get updates.
@@ -31,83 +32,102 @@ namespace CatanServiceMonitor
     public class ServiceMonitor
     {
         public event ServiceMonitorHandler OnCallback;
+        HttpClient _client = new HttpClient()
+        {
+            Timeout = TimeSpan.FromHours(12)
+        };
 
-      
         public string MonitorUrl { get; set; } = "";
         private bool _go = true;
 
         public ServiceMonitor() { }
 
         public ServiceMonitor(string url)
-        {            
+        {
             MonitorUrl = url;
-      
-
-
         }
-        public async void  Start()
+        public async void Start()
         {
             _go = true;
-            await Window.Current.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+
+
+            try
             {
-                if (OnCallback == null)
-                {
-                    throw new Exception("The callback for the Service Monitor is not set Url={MonitorUrl}");
-                }
 
-                if (String.IsNullOrEmpty(MonitorUrl))
+                await Window.Current.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
-                    throw new Exception("The Url for the monitor is not set");
+                    await ExecuteHangingGet();
 
-                }
-
-                HttpClient client = new HttpClient
-                {
-                    Timeout = TimeSpan.FromHours(12)
-                };
-                this.TraceMessage($"Starting monitor for url={this.MonitorUrl}");
-                while (_go)
-                {
-
-                    try
+                    this.TraceMessage($"Starting while loop url={this.MonitorUrl}");
+                    int count = 0;
+                    while (_go)
                     {
-                        string json = await client.GetStringAsync(MonitorUrl);
-                        OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Normal, Message = json });
 
-                    }
-                    catch (Exception requestException)
-                    {
-                        if (requestException.InnerException is WebException webException && webException.Status == WebExceptionStatus.Timeout)
-                        {
-                            OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Error, Message = $"[Url={MonitorUrl}] Timed out!" });
-                        }
-                        else
-                        {
-                            OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Error, Message = $"[Url={MonitorUrl}] Exception Message: {requestException}" });
-                            break;
-                        }
-
+                        this.TraceMessage($"{MonitorUrl} call count={count++}");
                     }
 
-                }
+                });
 
+                this.TraceMessage($"Exiting Monitoring for {MonitorUrl}");
 
-                this.TraceMessage($"Stopping monitor for url={this.MonitorUrl}");
-            });
+            }
+            finally
+            {
+
+            }
 
 
         }
+
+        public async Task ExecuteHangingGet()
+        {
+
+            if (OnCallback == null)
+            {
+                throw new Exception("The callback for the Service Monitor is not set Url={MonitorUrl}");
+            }
+
+            if (String.IsNullOrEmpty(MonitorUrl))
+            {
+                throw new Exception("The Url for the monitor is not set");
+
+            }
+
+            try
+            {
+
+                string json = await _client.GetStringAsync(MonitorUrl);
+                OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Normal, Message = json });
+
+            }
+            catch (Exception requestException)
+            {
+                if (requestException.InnerException is WebException webException && webException.Status == WebExceptionStatus.Timeout)
+                {
+                    OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Error, Message = $"[Url={MonitorUrl}] Timed out!" });
+                }
+                else
+                {
+                    OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Error, Message = $"[Url={MonitorUrl}] Exception Message: {requestException}" });
+                    return;
+                }
+
+            }
+        }
+
+
+
         public void Stop()
         {
             _go = false;
             this.TraceMessage($"stopped timer for URL={MonitorUrl}");
         }
-      
+
     }
 
     public class MonitorPlayerResources
     {
-        
+
         private PlayerResources _playerResources;
         private ServiceMonitor _serviceMonitor = new ServiceMonitor();
         public MonitorPlayerResources(string gameName, string player, string hostName, PlayerResources pr)
@@ -135,22 +155,13 @@ namespace CatanServiceMonitor
         {
             if (msg.MessageType == CatanServiceMessageType.Error)
             {
-                throw new Exception("Error returned by Monitor");                
+                throw new Exception("Error returned by Monitor");
             }
 
-            var pr = JsonSerializer.Deserialize<PlayerResources>(msg.Message);
+            this.TraceMessage(msg.Message);
 
-            _playerResources.Brick = pr.Brick;
-            _playerResources.Wood = pr.Wood;
-            _playerResources.Wheat = pr.Wheat;
-            _playerResources.Ore = pr.Ore;
-            _playerResources.Sheep = pr.Sheep;
-            _playerResources.GoldMine = pr.GoldMine;
-            _playerResources.Players = pr.Players;
-            _playerResources.DevCards = pr.DevCards;
-            _playerResources.GoldMine = pr.GoldMine;
+            // var pr = JsonSerializer.Deserialize<PlayerResources>(msg.Message);
 
-            _playerResources.DevCards = pr.DevCards;
         }
     }
 }

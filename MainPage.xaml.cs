@@ -17,19 +17,31 @@ using Windows.Foundation;
 namespace CatanSvcTestClient
 {
 
+    class Header
+    {
+        public string Description { get; set; }
+
+    }
+
+    class Sub : Header
+    {
+        public string Field1 { get; set; } = "field1";
+        public int Foo { get; set; } = 10;
+    }
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page
     {
-      
-        
-        ObservableCollection<PlayerResources> Players { get; set; } = new ObservableCollection<PlayerResources>();
+
+
+        ObservableCollection<ClientResourceModel> Players { get; set; } = new ObservableCollection<ClientResourceModel>();
 
         private string _hostName = "http://localhost:50919";
         private string GameName { get; } = "Game";
         ServiceMonitor _logMonitor;
-        
+
 
         public static readonly DependencyProperty RESTReturnValueProperty = DependencyProperty.Register("RESTReturnValue", typeof(string), typeof(MainPage), new PropertyMetadata(""));
         public static readonly DependencyProperty ChangeLogProperty = DependencyProperty.Register("ChangeLog", typeof(string), typeof(MainPage), new PropertyMetadata(""));
@@ -56,23 +68,9 @@ namespace CatanSvcTestClient
         public MainPage()
         {
             this.InitializeComponent();
-            
-
-            _logMonitor = new ServiceMonitor($"{_hostName}/api/monitor/resources/all");
-            _logMonitor.OnCallback += LogMonitorCallback;
-
 
         }
 
-        private async void LogMonitorCallback(CatanServiceMessage message)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                ChangeLog = Environment.NewLine + message.MessageType + "\t" + message.Message + Environment.NewLine + ChangeLog;
-
-            });
-
-        }
 
 
         private async void OnStart(object sender, RoutedEventArgs e)
@@ -83,31 +81,43 @@ namespace CatanSvcTestClient
             };
 
             Players.Clear();
-          
+
 
             var players = new string[] { "Joe", "Dodgy", "Doug", "Chris" };
-            _ = await client.DeleteAsync($"{_hostName}/api/catan/game/delete/{GameName}/");
+            var response = await client.DeleteAsync($"{_hostName}/api/catan/game/delete/{GameName}/");
+            if (!response.IsSuccessStatusCode)
+            {
+                ChangeLog = $"Delete returned: {CatanSerializer.Serialize<HttpResponseMessage>(response, true)}";
+
+            }
             foreach (var player in players)
             {
                 var url = $"{_hostName}/api/catan/game/register/{GameName}/{player}";
-                var response = await client.PostAsync(url, null);
+                response = await client.PostAsync(url, null);
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    
-                    PlayerResources resources = PlayerResources.Deserialize<PlayerResources>(json);
-                    Players.Add(resources);
-                   
-                  
+
+                    PlayerResources resources = CatanSerializer.Deserialize<PlayerResources>(json);
+                    ClientResourceModel model = new ClientResourceModel()
+                    {
+                        PlayerResources = resources
+                    };
+                    model.Players.Add(player);
+
+                    Players.Add(model); // created the control -- note PlayerName already set
+
                 }
 
             }
-            _logMonitor.Start();
-
         }
+
+
 
         private void OnBadTradeRequest(object sender, RoutedEventArgs e)
         {
+
+
             //HttpClient client = new HttpClient();
             //var resources = new PlayerResources
             //{
@@ -146,54 +156,37 @@ namespace CatanSvcTestClient
 
         private void OnDoTrade(object sender, RoutedEventArgs e)
         {
-        //    HttpClient client = new HttpClient();           
-        //    var resources = new PlayerResources[2] { _player1Trade.PlayerResources, _player2Trade.PlayerResources };            
-        //    var response = await client.PostAsync($"{_hostName}/api/catan/resourcecards/trade/{_gameName}/{_player1Resources.PlayerName}/{_player2Resources.PlayerName}", new StringContent(JsonSerializer.Serialize<PlayerResources[]>(resources), Encoding.UTF8, "application/json"));
-        //    RESTReturnValue = FormatJson<PlayerResources[]>(await response.Content.ReadAsStringAsync());
-        //}
+            //    HttpClient client = new HttpClient();           
+            //    var resources = new PlayerResources[2] { _player1Trade.PlayerResources, _player2Trade.PlayerResources };            
+            //    var response = await client.PostAsync($"{_hostName}/api/catan/resourcecards/trade/{_gameName}/{_player1Resources.PlayerName}/{_player2Resources.PlayerName}", new StringContent(JsonSerializer.Serialize<PlayerResources[]>(resources), Encoding.UTF8, "application/json"));
+            //    RESTReturnValue = FormatJson<PlayerResources[]>(await response.Content.ReadAsStringAsync());
+            //}
 
-        //private async void OnTakeCard(object sender, RoutedEventArgs e)
-        //{
-        //    HttpClient client = new HttpClient();
-        //    var response = await client.PostAsync($"{_hostName}/api/catan/resourcecards/take/{_gameName}/{_player1Resources.PlayerName}/{_player2Resources.PlayerName}", null);
-        //    RESTReturnValue = FormatJson<PlayerResources>(await response.Content.ReadAsStringAsync());
+            //private async void OnTakeCard(object sender, RoutedEventArgs e)
+            //{
+            //    HttpClient client = new HttpClient();
+            //    var response = await client.PostAsync($"{_hostName}/api/catan/resourcecards/take/{_gameName}/{_player1Resources.PlayerName}/{_player2Resources.PlayerName}", null);
+            //    RESTReturnValue = FormatJson<PlayerResources>(await response.Content.ReadAsStringAsync());
         }
 
-        private string FormatJson<T>(string json)
-        {
-            try
-            {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                };
 
-                T obj = JsonSerializer.Deserialize<T>(json);
-                return JsonSerializer.Serialize<T>(obj, options);
-
-            }
-            catch
-            {
-                return json;
-            }
-        }
 
         private void OnTradeThreeForOne(object sender, RoutedEventArgs e)
         {
-        //    HttpClient client = new HttpClient();
-        //    var resources = new PlayerResources
-        //    {
-        //        Wheat = 1,
-        //        Wood = 0,
-        //        Ore = 0,
-        //        Sheep = 0,
-        //        Brick = 0,
-        //        GoldMine = 0
-        //    };
+            //    HttpClient client = new HttpClient();
+            //    var resources = new PlayerResources
+            //    {
+            //        Wheat = 1,
+            //        Wood = 0,
+            //        Ore = 0,
+            //        Sheep = 0,
+            //        Brick = 0,
+            //        GoldMine = 0
+            //    };
 
-        //    _ = await client.PostAsync($"{_hostName}/api/catan/resourcecards/add/{_gameName}/{_player1Resources.PlayerName}", new StringContent(JsonSerializer.Serialize<PlayerResources>(resources), Encoding.UTF8, "application/json"));
-        //    var response = await client.PostAsync($"{_hostName}/api/catan/resourcecards/meritimetrade/{_gameName}/{_player1Resources.PlayerName}/Wheat/3/Wood", null);
-        //    RESTReturnValue = FormatJson<PlayerResources>(await response.Content.ReadAsStringAsync());
+            //    _ = await client.PostAsync($"{_hostName}/api/catan/resourcecards/add/{_gameName}/{_player1Resources.PlayerName}", new StringContent(JsonSerializer.Serialize<PlayerResources>(resources), Encoding.UTF8, "application/json"));
+            //    var response = await client.PostAsync($"{_hostName}/api/catan/resourcecards/meritimetrade/{_gameName}/{_player1Resources.PlayerName}/Wheat/3/Wood", null);
+            //    RESTReturnValue = FormatJson<PlayerResources>(await response.Content.ReadAsStringAsync());
         }
 
         private void OnGrantResources(object sender, RoutedEventArgs e)
@@ -217,18 +210,30 @@ namespace CatanSvcTestClient
                     Sheep = 1,
                     Brick = 1,
                     GoldMine = 1,
-                    PlayerName = player.PlayerName,
+                    PlayerName = player.PlayerResources.PlayerName,
                     GameName = GameName
                 };
                 //
                 //  give the player some resources
-                _ = await client.PostAsync($"{_hostName}/api/catan/resourcecards/add/{GameName}/{player.PlayerName}", new StringContent(JsonSerializer.Serialize<PlayerResources>(resources), Encoding.UTF8, "application/json"));
+                _ = await client.PostAsync($"{_hostName}/api/catan/resource/grant/{GameName}/{player.PlayerResources.PlayerName}", new StringContent(CatanSerializer.Serialize<PlayerResources>(resources), Encoding.UTF8, "application/json"));
             }
         }
 
         private void OnGetResources(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void OnTest(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+
+        private void Player_OnCallback(CatanServiceMessage message)
+        {
+            ChangeLog = Environment.NewLine + message.MessageType + ":" + Environment.NewLine + message.Message + Environment.NewLine + ChangeLog;
         }
     }
 
