@@ -38,10 +38,9 @@ namespace CatanSvcTestClient
 
         ObservableCollection<ClientResourceModel> Players { get; set; } = new ObservableCollection<ClientResourceModel>();
 
-        private string _hostName = "http://localhost:50919";
+        private string _hostName = "http://localhost:5000";
         private string GameName { get; } = "Game";
-        ServiceMonitor _logMonitor;
-
+        
 
         public static readonly DependencyProperty RESTReturnValueProperty = DependencyProperty.Register("RESTReturnValue", typeof(string), typeof(MainPage), new PropertyMetadata(""));
         public static readonly DependencyProperty ChangeLogProperty = DependencyProperty.Register("ChangeLog", typeof(string), typeof(MainPage), new PropertyMetadata(""));
@@ -75,44 +74,17 @@ namespace CatanSvcTestClient
 
         private async void OnStart(object sender, RoutedEventArgs e)
         {
-            HttpClient client = new HttpClient
+            using (CatanProxy proxy = new CatanProxy() { HostName = _hostName })
             {
-                Timeout = TimeSpan.FromMinutes(60)
-            };
-
-            Players.Clear();
-
-
-            var players = new string[] { "Joe", "Dodgy", "Doug", "Chris" };
-            var response = await client.DeleteAsync($"{_hostName}/api/catan/game/delete/{GameName}/");
-            if (!response.IsSuccessStatusCode)
-            {
-                ChangeLog = $"Delete returned: {CatanSerializer.Serialize<HttpResponseMessage>(response, true)}";
-
-            }
-            foreach (var player in players)
-            {
-                var url = $"{_hostName}/api/catan/game/register/{GameName}/{player}";
-                response = await client.PostAsync(url, null);
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-
-                    PlayerResources resources = CatanSerializer.Deserialize<PlayerResources>(json);
-                    ClientResourceModel model = new ClientResourceModel()
-                    {
-                        PlayerResources = resources
-                    };
-                    model.Players.Add(player);
-
-                    Players.Add(model); // created the control -- note PlayerName already set
-
-                }
+                await proxy.StartGame(GameName);
 
             }
         }
 
-
+        private void AddToChangeLog(string message)
+        {
+            ChangeLog += message + Environment.NewLine;
+        }
 
         private void OnBadTradeRequest(object sender, RoutedEventArgs e)
         {
@@ -189,20 +161,11 @@ namespace CatanSvcTestClient
             //    RESTReturnValue = FormatJson<PlayerResources>(await response.Content.ReadAsStringAsync());
         }
 
-        private void OnGrantResources(object sender, RoutedEventArgs e)
+        private async void OnGrantResources(object sender, RoutedEventArgs e)
         {
-            //HttpClient client = new HttpClient();
-            //var response = await client.PostAsync($"{_hostName}/api/catan/resourcecards/add/{_gameName}/{_cmbPlayers.SelectedItem}", new StringContent(JsonSerializer.Serialize<PlayerResources>(_bank.PlayerResources), Encoding.UTF8, "application/json"));
-            // RESTReturnValue = FormatJson<PlayerResources>(await response.Content.ReadAsStringAsync());            
-
-        }
-
-        private async void OnGrantResourcesToAll(object sender, RoutedEventArgs e)
-        {
-            HttpClient client = new HttpClient();
-            foreach (var player in Players)
+            using (CatanProxy proxy = new CatanProxy() { HostName = _hostName })
             {
-                var resources = new PlayerResources
+                var resources = new TradeResources
                 {
                     Wheat = 1,
                     Wood = 1,
@@ -210,12 +173,34 @@ namespace CatanSvcTestClient
                     Sheep = 1,
                     Brick = 1,
                     GoldMine = 1,
-                    PlayerName = player.PlayerResources.PlayerName,
-                    GameName = GameName
                 };
                 //
                 //  give the player some resources
-                _ = await client.PostAsync($"{_hostName}/api/catan/resource/grant/{GameName}/{player.PlayerResources.PlayerName}", new StringContent(CatanSerializer.Serialize<PlayerResources>(resources), Encoding.UTF8, "application/json"));
+                //   await proxy.GrantResources(GameName, CurrentPlayer.PlayerName, resources);
+
+            }
+
+        }
+
+        private async void OnGrantResourcesToAll(object sender, RoutedEventArgs e)
+        {
+            using (CatanProxy proxy = new CatanProxy() { HostName = _hostName })
+            {
+                foreach (var player in Players)
+                {
+                    var resources = new TradeResources
+                    {
+                        Wheat = 1,
+                        Wood = 1,
+                        Ore = 1,
+                        Sheep = 1,
+                        Brick = 1,
+                        GoldMine = 1,
+                    };
+                    //
+                    //  give the player some resources
+                    await proxy.GrantResources(GameName, player.PlayerResources.PlayerName, resources);
+                }
             }
         }
 
@@ -233,7 +218,77 @@ namespace CatanSvcTestClient
 
         private void Player_OnCallback(CatanServiceMessage message)
         {
-            ChangeLog = Environment.NewLine + message.MessageType + ":" + Environment.NewLine + message.Message + Environment.NewLine + ChangeLog;
+            
+            AddToChangeLog($"Begin: [Reciever={message.ReceivingClient}]");            
+            foreach (object o in message.Log)
+            {                
+                AddToChangeLog(CatanSerializer.Serialize<object>(o, true));
+            }
+            AddToChangeLog($"End: [Reciever={message.ReceivingClient}]");
+            AddToChangeLog("-------------------------------------------------------------------------------------------------------");
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            CurrentPlayer = e.AddedItems[0] as PlayerResources;
+        }
+
+        private void OnClearLog(object sender, RoutedEventArgs e)
+        {
+            ChangeLog = "";
+        }
+
+        private async void AddPlayers(object sender, RoutedEventArgs e)
+        {
+            ChangeLog = "";
+            using (CatanProxy proxy = new CatanProxy() { HostName = _hostName })
+            {
+
+
+                Players.Clear();
+
+
+                var players = new string[] { "Joe", "Dodgy" };
+                var response = await proxy.DeleteGame(GameName);
+                if (response == null)
+                {
+                    AddToChangeLog(proxy.LastErrorString);
+                }
+                else
+                {
+                    AddToChangeLog(CatanSerializer.Serialize<CatanResult>(response, true));
+                }
+
+                foreach (var player in players)
+                {
+                    var resources = await proxy.Register(new GameInfo(), GameName, player);
+                    if (resources != null)
+                    {
+                        ClientResourceModel model = new ClientResourceModel()
+                        {
+                            PlayerResources = resources
+                        };
+                        model.Players.Add(player);
+
+                        Players.Add(model); // created the control -- note PlayerName already set
+                        AddToChangeLog(CatanSerializer.Serialize<PlayerResources>(resources, true));
+
+                    }
+                    else
+                    {
+                        AddToChangeLog("Error!");
+                        if (proxy.LastError != null)
+                        {
+                            AddToChangeLog(CatanSerializer.Serialize<CatanResult>(proxy.LastError, true));
+                        }
+                        else
+                        {
+                            AddToChangeLog(proxy.LastErrorString);
+                        }
+                    }
+                }
+
+            }
         }
     }
 

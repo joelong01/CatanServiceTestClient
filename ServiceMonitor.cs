@@ -20,8 +20,10 @@ namespace CatanServiceMonitor
     public class CatanServiceMessage
     {
         public CatanServiceMessageType MessageType { get; set; }
-        public string Message { get; set; }
-
+        
+        public List<ServiceLogEntry> Log { get; set; }
+        public string Message { get; internal set; }
+        public string ReceivingClient { get; internal set; }
     }
 
 
@@ -32,23 +34,33 @@ namespace CatanServiceMonitor
     public class ServiceMonitor
     {
         public event ServiceMonitorHandler OnCallback;
-        HttpClient _client = new HttpClient()
-        {
-            Timeout = TimeSpan.FromHours(12)
-        };
+        CatanProxy CatanProxy = new CatanProxy();
 
-        public string MonitorUrl { get; set; } = "";
+        public string GameName { get; set; }
+        public string PlayerName { get; set; }
+        
+        public string HostName 
+        {
+            get => CatanProxy.HostName;
+            set
+            {
+               
+                CatanProxy.HostName = value;
+            } 
+        }
         private bool _go = true;
 
         public ServiceMonitor() { }
 
-        public ServiceMonitor(string url)
+        public ServiceMonitor(string game, string player)
         {
-            MonitorUrl = url;
+            GameName = game;
+            PlayerName = player;
+
         }
         public async void Start()
         {
-            _go = true;
+            _go = true; 
 
 
             try
@@ -56,19 +68,20 @@ namespace CatanServiceMonitor
 
                 await Window.Current.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
-                    await ExecuteHangingGet();
+                    
 
-                    this.TraceMessage($"Starting while loop url={this.MonitorUrl}");
+                   // this.TraceMessage($"Starting while loop [Game={GameName}] [Player={PlayerName}]");
                     int count = 0;
                     while (_go)
                     {
 
-                        this.TraceMessage($"{MonitorUrl} call count={count++}");
+                        this.TraceMessage($"[Game={GameName}] [Player={PlayerName}] call count={count++}");
+                        await ExecuteHangingGet();
                     }
 
                 });
 
-                this.TraceMessage($"Exiting Monitoring for {MonitorUrl}");
+               // this.TraceMessage($"Exiting Monitoring for [Game={GameName}] [Player={PlayerName}]");
 
             }
             finally
@@ -84,34 +97,31 @@ namespace CatanServiceMonitor
 
             if (OnCallback == null)
             {
-                throw new Exception("The callback for the Service Monitor is not set Url={MonitorUrl}");
+                throw new Exception($"The callback for the Service Monitor is not set Url=[Game={GameName}] [Player={PlayerName}]");
             }
 
-            if (String.IsNullOrEmpty(MonitorUrl))
+            if (String.IsNullOrEmpty(GameName) || String.IsNullOrEmpty(PlayerName))
             {
-                throw new Exception("The Url for the monitor is not set");
+                throw new Exception("GameName and PlayerName cannot be null");
 
             }
 
             try
             {
 
-                string json = await _client.GetStringAsync(MonitorUrl);
-                OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Normal, Message = json });
+                var response = await CatanProxy.Monitor(GameName, PlayerName);
+                if (response != null)
+                {                    
+                    OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Normal, Log = response});
+                }
+                
+
 
             }
-            catch (Exception requestException)
+            catch
             {
-                if (requestException.InnerException is WebException webException && webException.Status == WebExceptionStatus.Timeout)
-                {
-                    OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Error, Message = $"[Url={MonitorUrl}] Timed out!" });
-                }
-                else
-                {
-                    OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Error, Message = $"[Url={MonitorUrl}] Exception Message: {requestException}" });
-                    return;
-                }
-
+                OnCallback.Invoke(new CatanServiceMessage { MessageType = CatanServiceMessageType.Error, Message = $"[Url=[Game={GameName}] [Player={PlayerName}]] Exception Message: {CatanProxy.LastErrorString}" });
+                return;
             }
         }
 
@@ -120,48 +130,9 @@ namespace CatanServiceMonitor
         public void Stop()
         {
             _go = false;
-            this.TraceMessage($"stopped timer for URL={MonitorUrl}");
+            this.TraceMessage($"stopped timer for URL=[Game={GameName}] [Player={PlayerName}]");
         }
 
     }
 
-    public class MonitorPlayerResources
-    {
-
-        private PlayerResources _playerResources;
-        private ServiceMonitor _serviceMonitor = new ServiceMonitor();
-        public MonitorPlayerResources(string gameName, string player, string hostName, PlayerResources pr)
-        {
-            _playerResources = pr;
-            _serviceMonitor.OnCallback += MonitorPlayerResources_OnCallback;
-            _serviceMonitor.MonitorUrl = $"{hostName}/api/monitor/resources/{gameName}/{player}";
-        }
-
-        public void Start()
-        {
-            _serviceMonitor.Start();
-        }
-
-        public void Stop()
-        {
-            _serviceMonitor.Stop();
-        }
-
-        /// <summary>
-        ///     update the properties by value -- the properties are protected from updating when not changed.
-        /// </summary>
-        /// <param name="msg"></param>
-        private void MonitorPlayerResources_OnCallback(CatanServiceMessage msg)
-        {
-            if (msg.MessageType == CatanServiceMessageType.Error)
-            {
-                throw new Exception("Error returned by Monitor");
-            }
-
-            this.TraceMessage(msg.Message);
-
-            // var pr = JsonSerializer.Deserialize<PlayerResources>(msg.Message);
-
-        }
-    }
 }
