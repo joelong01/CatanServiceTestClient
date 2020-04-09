@@ -9,21 +9,21 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace CatanSvcTestClient
+namespace Catan.Proxy
 {
     public class ProxyResult<T>
     {
         public T Result { get; set; }
-        public string RawJson {get;set;}
+        public string RawJson { get; set; }
         public int ErrorCode { get; set; }
 
     }
 
-    class CatanProxy : IDisposable
+    public class CatanProxy : IDisposable
     {
 
 
-        private HttpClient Client { get; } = new HttpClient();
+        public HttpClient Client { get; set; } = new HttpClient();
 
         public string HostName { get; set; } // "http://localhost:50919";
         public CatanResult LastError { get; set; } = null;
@@ -44,7 +44,37 @@ namespace CatanSvcTestClient
             return Post<PlayerResources>(url, CatanSerializer.Serialize<GameInfo>(info));
 
         }
+        public Task<List<string>> GetGames()
+        {
+            string url = $"{HostName}/api/catan/game";
 
+            return Get<List<string>>(url);
+
+        }
+        public Task<List<string>> GetUsers(string game)
+        {
+            if (String.IsNullOrEmpty(game))
+            {
+                throw new Exception("names can't be null or empty");
+            }
+
+            string url = $"{HostName}/api/catan/game/users/{game}";
+
+            return Get<List<string>>(url);
+
+        }
+        public Task<GameInfo> GetGameInfo(string game)
+        {
+            if (String.IsNullOrEmpty(game))
+            {
+                throw new Exception("names can't be null or empty");
+            }
+
+            string url = $"{HostName}/api/catan/game/gameInfo/{game}";
+
+            return Get<GameInfo>(url);
+
+        }
         public Task<CatanResult> DeleteGame(string gameName)
         {
 
@@ -65,11 +95,11 @@ namespace CatanSvcTestClient
             {
                 throw new Exception("names can't be null or empty");
             }
-            string url= $"{HostName}/api/catan/game/start/{game}";
+            string url = $"{HostName}/api/catan/game/start/{game}";
             return Post<string>(url, null);
         }
 
-        public async Task<List<ServiceLogEntry>> Monitor(string game, string player)
+        public async Task<List<ServiceLogRecord>> Monitor(string game, string player)
         {
             if (String.IsNullOrEmpty(game))
             {
@@ -82,15 +112,15 @@ namespace CatanSvcTestClient
                 AllowTrailingCommas = true
             };
 
-          //  this.TraceMessage($"{json}");
-            List<ServiceLogEntry> logList = new List<ServiceLogEntry>();
+            //  this.TraceMessage($"{json}");
+            List<ServiceLogRecord> logList = new List<ServiceLogRecord>();
             using (JsonDocument document = JsonDocument.Parse(Encoding.UTF8.GetBytes(json), options))
             {
-                
+
                 foreach (JsonElement element in document.RootElement.EnumerateArray())
                 {
-                  //  this.TraceMessage($"{element}");
-                    ServiceLogEntry logEntry = CatanSerializer.Deserialize<ServiceLogEntry>(element.GetRawText());
+                    //  this.TraceMessage($"{element}");
+                    ServiceLogRecord logEntry = CatanSerializer.Deserialize<ServiceLogRecord>(element.GetRawText());
                     Debug.WriteLine($"Log Received.  [ID={logEntry.LogId}] [Player={logEntry.PlayerName}]");
                     switch (logEntry.Action)
                     {
@@ -141,7 +171,7 @@ namespace CatanSvcTestClient
                     }
                 }
 
-                
+
             }
             Debug.WriteLine($"[Game={game}] [Player={player}] [LogCount={logList.Count}]");
             return logList;
@@ -170,7 +200,7 @@ namespace CatanSvcTestClient
             var body = CatanSerializer.Serialize<TradeResources[]>(new TradeResources[] { from, to });
             return Post<List<PlayerResources>>(url, body);
         }
-        
+
 
         private async Task<T> Get<T>(string url)
         {
@@ -293,7 +323,7 @@ namespace CatanSvcTestClient
                 {
                     response = await Client.PostAsync(url, new StringContent("", Encoding.UTF8, "application/json"));
                 }
-                
+
                 string json = await response.Content.ReadAsStringAsync();
                 if (typeof(T) == typeof(string))
                 {

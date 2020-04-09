@@ -1,22 +1,14 @@
 ﻿
+using Catan.Proxy;
 using CatanServiceMonitor;
 using CatanSharedModels;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+
 using System.Threading.Tasks;
-using Windows.Networking.Sockets;
-using Windows.Storage.Streams;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.Web;
+
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 

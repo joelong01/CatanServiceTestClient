@@ -30,11 +30,12 @@
         </Grid.RowDefinitions>
         <Viewbox Grid.RowSpan="1">
             <StackPanel Orientation="Horizontal" Grid.RowSpan="1">
-                <Button Content="Add Players"            Click="AddPlayers"                Style="{StaticResource CommandButtonStyle}"/>
-                <Button Content="Start Game"             Click="OnStart"  Style="{StaticResource CommandButtonStyle}"/>
+                <Button Content="Add Players"            Click="AddPlayers"             Style="{StaticResource CommandButtonStyle}"/>
+                <Button Content="Start Game"             Click="OnStart"                Style="{StaticResource CommandButtonStyle}"/>
                 <Button Content="Resources To All"       Click="OnGrantResourcesToAll"  Style="{StaticResource CommandButtonStyle}"/>
+                <Button Content="Test"                   Click="OnTest"                 Style="{StaticResource CommandButtonStyle}" />
                 <Button Content="Grant Resources"        Click="OnGrantResources"       Style="{StaticResource CommandButtonStyle}" />
-                <Button Content="Clear Log"              Click="OnClearLog"                 Style="{StaticResource CommandButtonStyle}" />
+                <Button Content="Clear Log"              Click="OnClearLog"             Style="{StaticResource CommandButtonStyle}" />
                 <Button Content="Gold Trade"             Click="OnTradeInGold"          Style="{StaticResource CommandButtonStyle}" />
                 <Button Content="Do Trade"               Click="OnDoTrade"              Style="{StaticResource CommandButtonStyle}" />
                 <Button Content="3:1"                    Click="OnTradeThreeForOne"     Style="{StaticResource CommandButtonStyle}" />

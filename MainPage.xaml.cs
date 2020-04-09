@@ -11,6 +11,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using CatanServiceMonitor;
 using Windows.Foundation;
+using Catan.Proxy;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -211,7 +212,23 @@ namespace CatanSvcTestClient
 
         private void OnTest(object sender, RoutedEventArgs e)
         {
+            List<object> list = new List<object>();
+            list.Add(new Sub()
+            {
+                Description = "one",
+                Field1 = "two",
+                Foo = 5
+            });
+            list.Add(new Sub()
+            {
+                Description = "two",
+                Field1 = "three",
+                Foo = 6
+            });
 
+            string json = CatanSerializer.Serialize<List<object>>(list, true);
+            this.TraceMessage(json);
+            var test = CatanSerializer.Deserialize<List<object>>(json);
         }
 
 

@@ -1,13 +1,9 @@
-﻿using CatanSharedModels;
+﻿using Catan.Proxy;
+using CatanSharedModels;
 using CatanSvcTestClient;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+
 using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -21,7 +17,7 @@ namespace CatanServiceMonitor
     {
         public CatanServiceMessageType MessageType { get; set; }
         
-        public List<ServiceLogEntry> Log { get; set; }
+        public List<ServiceLogRecord> Log { get; set; }
         public string Message { get; internal set; }
         public string ReceivingClient { get; internal set; }
     }
